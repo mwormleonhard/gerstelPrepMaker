@@ -11,7 +11,8 @@ this stuff is worth it, you can buy me a beer in return.   Martin Worm-Leonhard
 ----------------------------------------------------------------------------
 """
 import PrepControlStrings
-import csv, re
+import csv, datetime
+from more_itertools import unique_everseen  # Pip install more_itertools
 
 
 def getVolumeLists(infilename='volumelist.csv'):
@@ -27,25 +28,29 @@ def getVolumeLists(infilename='volumelist.csv'):
 
 
 def writePrepSequence(vialvolumelist, outfilename='output.prp', startvial=1, endvial=10):
+
     linesInSeq = 3*len(vialvolumelist)
+    uniqueVolumes = list(unique_everseen([vol for (vial, vol) in vialvolumelist]))
 
     with open(outfilename, 'wb') as f:
-        f.write(PrepControlStrings.preamble.format(numLines=linesInSeq))
-        for vial, volume in vialvolumelist:
+        f.write(PrepControlStrings.preamble.format(numLines=linesInSeq, datetime=datetime.datetime.now().isoformat()))
+        for volume in uniqueVolumes:
             if float(volume) <= 10:
                 f.write(PrepControlStrings.methodblock10ulSyringe.format(volume=volume))
             elif float(volume) < 100:
                 f.write(PrepControlStrings.methodblock100ulSyringe.format(volume=volume))
             else:
                 raise Exception('Volume error')
+
         f.write(PrepControlStrings.prepstepHeader)
-        linecount = 1        
+
+        linecount = 1
         for vial, volume in vialvolumelist:
             if float(volume) <= 10:
-                f.write(PrepControlStrings.prepstep.format(line1=linecount, line2=linecount+1, line3=linecount+2, destvialstart=startvial, destvialend=endvial, sourcevial=vial, volume=volume, head="LEFT"))
+                f.write(PrepControlStrings.prepstep.format(line1=linecount, line2=linecount+1, line3=linecount+2, destvialstart=startvial, destvialend=endvial, sourcevial=vial, volume=volume, head="RIGHT"))
                 linecount += 3
             elif float(volume) < 100:
-                f.write(PrepControlStrings.prepstep.format(line1=linecount, line2=linecount+1, line3=linecount+2, destvialstart=startvial, destvialend=endvial, sourcevial=vial, volume=volume, head="RIGHT"))
+                f.write(PrepControlStrings.prepstep.format(line1=linecount, line2=linecount+1, line3=linecount+2, destvialstart=startvial, destvialend=endvial, sourcevial=vial, volume=volume, head="LEFT"))
                 linecount += 3
             else:
                 raise Exception('Volume error')
@@ -53,3 +58,7 @@ def writePrepSequence(vialvolumelist, outfilename='output.prp', startvial=1, end
 
 if __name__ == '__main__':
     writePrepSequence(vialvolumelist=getVolumeLists())
+    print "File created"
+    print "Install 100µLALX syringe in left head before loading .prp file"
+    print "Install 10µLALX syringe in right head before loading .prp file"
+    print "Have a nice day! :-)"
