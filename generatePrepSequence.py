@@ -11,8 +11,12 @@ this stuff is worth it, you can buy me a beer in return.   Martin Worm-Leonhard
 ----------------------------------------------------------------------------
 """
 import PrepControlStrings
-import csv, datetime
+import csv
+import datetime
 from more_itertools import unique_everseen  # Pip install more_itertools
+import tkFileDialog
+import tkSimpleDialog
+import tkMessageBox
 
 
 def getVolumeLists(infilename='volumelist.csv'):
@@ -33,7 +37,8 @@ def writePrepSequence(vialvolumelist, outfilename='output.prp', startvial=1, end
     uniqueVolumes = list(unique_everseen([vol for (vial, vol) in vialvolumelist]))
 
     with open(outfilename, 'wb') as f:
-        f.write(PrepControlStrings.preamble.format(numLines=linesInSeq, datetime=datetime.datetime.now().isoformat()))
+        f.write(PrepControlStrings.preamble.format(numLines=linesInSeq,
+                                                   datetime=datetime.datetime.now().isoformat()))
         for volume in uniqueVolumes:
             if float(volume) <= 10:
                 f.write(PrepControlStrings.methodblock10ulSyringe.format(volume=volume))
@@ -47,18 +52,60 @@ def writePrepSequence(vialvolumelist, outfilename='output.prp', startvial=1, end
         linecount = 1
         for vial, volume in vialvolumelist:
             if float(volume) <= 10:
-                f.write(PrepControlStrings.prepstep.format(line1=linecount, line2=linecount+1, line3=linecount+2, destvialstart=startvial, destvialend=endvial, sourcevial=vial, volume=volume, head="RIGHT"))
+                f.write(PrepControlStrings.prepstep.format(line1=linecount,
+                                                           line2=linecount+1,
+                                                           line3=linecount+2,
+                                                           destvialstart=startvial,
+                                                           destvialend=endvial,
+                                                           sourcevial=vial,
+                                                           volume=volume,
+                                                           head="RIGHT"))
                 linecount += 3
             elif float(volume) < 100:
-                f.write(PrepControlStrings.prepstep.format(line1=linecount, line2=linecount+1, line3=linecount+2, destvialstart=startvial, destvialend=endvial, sourcevial=vial, volume=volume, head="LEFT"))
+                f.write(PrepControlStrings.prepstep.format(line1=linecount,
+                                                           line2=linecount+1,
+                                                           line3=linecount+2,
+                                                           destvialstart=startvial,
+                                                           destvialend=endvial,
+                                                           sourcevial=vial,
+                                                           volume=volume,
+                                                           head="LEFT"))
                 linecount += 3
             else:
                 raise Exception('Volume error')
         f.write(PrepControlStrings.endmatter)
 
 if __name__ == '__main__':
-    writePrepSequence(vialvolumelist=getVolumeLists())
-    print "File created"
-    print "Install 100µLALX syringe in left head before loading .prp file"
-    print "Install 10µLALX syringe in right head before loading .prp file"
-    print "Have a nice day! :-)"
+    infile = tkFileDialog.askopenfilename(defaultextension='.csv',
+                                          filetypes=[('CSV file', '.csv')],
+                                          title='CSV file containing vials and volumes')
+
+    outfile = tkFileDialog.asksaveasfilename(defaultextension='.prp',
+                                             filetypes=[('PREP sequence', '.prp')],
+                                             title='Output file for prep sequence')
+
+    destvialstart = tkSimpleDialog.askinteger(title='First destination vial',
+                                              prompt='Enter first vial number for destination',
+                                              initialvalue=1,
+                                              minvalue=1,
+                                              maxvalue=90)
+
+    destvialend = tkSimpleDialog.askinteger(title='Last destination vial',
+                                            prompt='Enter last vial number for destination',
+                                            initialvalue=10,
+                                            minvalue=1,
+                                            maxvalue=90)
+
+    writePrepSequence(vialvolumelist=getVolumeLists(infilename=infile),
+                      outfilename=outfile,
+                      startvial=destvialstart,
+                      endvial=destvialend)
+
+    statusmessage = 'File '+infile+' read and processed\n\n File '+outfile+\
+    ' created\n\nInstall 100µLALX syringe in left head before loading .prp file\n\n\
+    Install 10µLALX syringe in right head before loading .prp file \n\n\
+    Have a nice day! :-)'
+
+
+    tkMessageBox.showinfo(title='All done!',
+                          message=statusmessage)
