@@ -51,7 +51,7 @@ def writePrepSequence(vialvolumelist, outfilename='output.prp', startvial=1, end
 
         linecount = 1
         for vial, volume in vialvolumelist:
-            if float(volume) <= 10:
+            if 0 < float(volume) <= 10:
                 f.write(PrepControlStrings.prepstep.format(line1=linecount,
                                                            line2=linecount+1,
                                                            line3=linecount+2,
