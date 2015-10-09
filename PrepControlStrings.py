@@ -49,9 +49,9 @@ Air Volume below=0.0
 Vial Penetration=32.00
 Dest. Vial Penetration=32.00
 Preclean Solv.1=0
-Postclean Solv.1=3
+Postclean Solv.1=0
 Preclean Solv.2=0
-Postclean Solv.2=3
+Postclean Solv.2=0
 Preclean Sample=0
 Fill Speed Solv.1=100.00
 Viscosity Delay Solv.1=0
@@ -93,9 +93,9 @@ Air Volume below=0.0
 Vial Penetration=32.00
 Dest. Vial Penetration=32.00
 Preclean Solv.1=0
-Postclean Solv.1=3
+Postclean Solv.1=0
 Preclean Solv.2=0
-Postclean Solv.2=3
+Postclean Solv.2=0
 Preclean Sample=0
 Fill Speed Solv.1=50.00
 Viscosity Delay Solv.1=0
@@ -121,12 +121,50 @@ Syringe Video Check Action=0
 Syringe Video Check Dispose To=0
 """
 
+wash100ul = """
+[wash2x3-100ul]
+Type=WASH
+Description=Syringe: 100ulALX%0D%0A
+Syr=100ulALX
+Preclean Solv.1=3
+Preclean Solv.2=3
+Fill Speed Solv.1=100.00
+Viscosity Delay Solv.1=0
+Eject Speed Solv.1=100.00
+Fill Speed Solv.2=100.00
+Viscosity Delay Solv.2=0
+Eject Speed Solv.2=100.00
+Wash Station 1=Wash1
+Wash Station 2=Wash2
+"""
+wash10ul = """
+[wash2x3-10ul]
+Type=WASH
+Description=Syringe: 10ulALX%0D%0A
+Syr=10ulALX
+Preclean Solv.1=3
+Preclean Solv.2=3
+Fill Speed Solv.1=10
+Viscosity Delay Solv.1=0
+Eject Speed Solv.1=10.00
+Fill Speed Solv.2=10.00
+Viscosity Delay Solv.2=0
+Eject Speed Solv.2=10.00
+Wash Station 1=Wash1
+Wash Station 2=Wash2
+"""
+
+
 prepstepHeader = "\n[PREPSTEPS]"
 
 prepstep = """
 {line1}=ACTION:PREP|VIALRANGE:{destvialstart}-{destvialend}|METHOD:NoPrepAhead|
 {line2}=ACTION:ADD|SAMPLER:{head}|METHOD:flyt{volume}ul|SOURCE:Tray1,VT98|DEST:Tray2,VT98|SOURCEVIAL:{sourcevial}|DESTVIAL:0|
 {line3}=ACTION:END|"""
+
+washstep = """
+{line4}=ACTION:WASH|SAMPLER:{head}|METHOD:wash2x3-{vol}ul|"""
+
 
 endmatter = """
 
