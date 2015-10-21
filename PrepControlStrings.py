@@ -22,9 +22,9 @@ VALUESEPARATOR=:
 LINES={numLines}
 METHODPATH=C:\ProgramData\Gerstel\Maestro\1\Methods\
 PREPPATH=
-Syr=100ulALX
-LeftSyr=100ulALX
-RightSyr=10ulALX
+Syr=10ulALX
+LeftSyr=10ulALX
+RightSyr=100ulALX
 MaestroVersion=1.4.29.15
 
 [CSPREP]
@@ -122,32 +122,32 @@ Syringe Video Check Dispose To=0
 """
 
 wash100ul = """
-[wash2x3-100ul]
+[wash2x2-100ul]
 Type=WASH
 Description=Syringe: 100ulALX%0D%0A
 Syr=100ulALX
-Preclean Solv.1=3
-Preclean Solv.2=3
-Fill Speed Solv.1=100.00
+Preclean Solv.1=2
+Preclean Solv.2=2
+Fill Speed Solv.1=30.00
 Viscosity Delay Solv.1=0
 Eject Speed Solv.1=100.00
-Fill Speed Solv.2=100.00
+Fill Speed Solv.2=30.00
 Viscosity Delay Solv.2=0
 Eject Speed Solv.2=100.00
 Wash Station 1=Wash1
 Wash Station 2=Wash2
 """
 wash10ul = """
-[wash2x3-10ul]
+[wash2x2-10ul]
 Type=WASH
 Description=Syringe: 10ulALX%0D%0A
 Syr=10ulALX
-Preclean Solv.1=3
-Preclean Solv.2=3
-Fill Speed Solv.1=10
+Preclean Solv.1=2
+Preclean Solv.2=2
+Fill Speed Solv.1=3
 Viscosity Delay Solv.1=0
 Eject Speed Solv.1=10.00
-Fill Speed Solv.2=10.00
+Fill Speed Solv.2=3
 Viscosity Delay Solv.2=0
 Eject Speed Solv.2=10.00
 Wash Station 1=Wash1
@@ -163,7 +163,7 @@ prepstep = """
 {line3}=ACTION:END|"""
 
 washstep = """
-{line4}=ACTION:WASH|SAMPLER:{head}|METHOD:wash2x3-{vol}ul|"""
+{line4}=ACTION:WASH|SAMPLER:{head}|METHOD:wash2x2-{vol}ul|"""
 
 
 endmatter = """
