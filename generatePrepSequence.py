@@ -33,15 +33,26 @@ def getVolumeLists(infilename='volumelist.csv'):
     return vialvolumelist
 
 
+def splitLargeVolumes(vialvolumelist, splitvolume=100):
+    """Handle list of vials and volumes, when volumes needed
+    is larger than splitvolume (100uL)"""
+    outputlist = []
+
+    for vial, volume in vialvolumelist:
+        if float(volume) > splitvolume:
+            steps = int(float(volume) // splitvolume) + 1
+            for antal in xrange(steps):
+                outputlist.append((vial, round((float(volume)/steps), 1)))
+        else:
+            outputlist.append((vial, volume))
+    return outputlist
+
+
+
 def writePrepSequence(vialvolumelist, outfilename='output.prp', startvial=1, endvial=10):
     # Split voluminer over 100 uL
-    for vial, volume in vialvolumelist:
-        if float(volume) > 100:
-            steps = int(float(volume) // 100) + 1
-            vialvolumelist.remove((vial, volume))
-            for antal in xrange(steps):
-                vialvolumelist.append((vial, round((float(volume)/steps), 1)))
-                
+    vialvolumelist = splitLargeVolumes(vialvolumelist)
+    # TODO: Find/fix hvorfor den fejler hvis flere linier efter hinanden har 100+ uL. Noget med in-place modifikation af listen?
     # Udregn antal linier i sekvensen
     linesInSeq = 4*len(vialvolumelist)+2
     uniqueVolumes = list(unique_everseen([vol for (vial, vol) in vialvolumelist]))
@@ -79,7 +90,7 @@ def writePrepSequence(vialvolumelist, outfilename='output.prp', startvial=1, end
                                                            sourcevial=vial,
                                                            volume=volume,
                                                            head="LEFT"))
-                
+
                 f.write(PrepControlStrings.washstep.format(line4=linecount+3,
                                                            head="LEFT",
                                                            vol=10))
@@ -93,7 +104,7 @@ def writePrepSequence(vialvolumelist, outfilename='output.prp', startvial=1, end
                                                            sourcevial=vial,
                                                            volume=volume,
                                                            head="RIGHT"))
-                
+
                 f.write(PrepControlStrings.washstep.format(line4=linecount+3,
                                                            head="RIGHT",
                                                            vol=100))
@@ -110,7 +121,7 @@ if __name__ == '__main__':
 #    rightsyringe = tkSimpleDialog.askstring(title='Højre Sprøjte?',
 #                                           prompt='Hvilken type sprøjte sidder på højre hoved?',
 #                                           initialvalue='100ulALX')
-    
+
     infile = tkFileDialog.askopenfilename(defaultextension='.csv',
                                           filetypes=[('CSV file', '.csv')],
                                           title='CSV file containing vials and volumes')
